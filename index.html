@@ -1,256 +1,169 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#100b19">
-<title>GTA VI обратный отсчет</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#090d18">
+<title>GTA VI Countdown</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
 <style>
-* {
-  box-sizing: border-box;
-}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;min-height:100dvh;background:radial-gradient(ellipse at 50% 5%,#73345e 0%,transparent 48%),linear-gradient(160deg,#160f28,#090b18 65%,#111827);color:#fff;font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;padding:22px;overflow-x:hidden}
+.app{width:100%;max-width:440px;text-align:center}
+.tag{color:#ff80c5;font-size:11px;letter-spacing:5px;margin-bottom:15px}
+.logo{font-size:clamp(44px,13vw,65px);font-weight:1000;letter-spacing:-4px;line-height:1;text-shadow:0 0 12px #f06cba,0 0 35px #a348b4}
+.logo span{display:block;color:#ff8acb;font-size:.75em;letter-spacing:9px;margin-top:9px}
+.subtitle{margin-top:38px;color:#e9b9db;font-size:13px;letter-spacing:3px}
+.date{margin-top:12px;font-size:22px;font-weight:bold}
+.timer{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:35px}
+.unit{background:linear-gradient(145deg,rgba(255,255,255,.12),rgba(255,255,255,.035));border:1px solid rgba(255,140,210,.25);border-radius:13px;padding:17px 3px;box-shadow:0 0 20px rgba(223,76,164,.08)}
+.number{font-size:clamp(25px,7vw,37px);font-weight:800;font-variant-numeric:tabular-nums}
+.label{font-size:9px;color:#e7a5d0;letter-spacing:1px;margin-top:9px}
+.status{margin-top:28px;color:#b9b1c9;font-size:12px}
+.line{height:2px;margin:32px 0 20px;background:linear-gradient(90deg,transparent,#f26bbd,#8c63e8,transparent)}
+.footer{color:#817b9a;font-size:10px;letter-spacing:2px}
+.play-button{margin-top:24px;width:100%;border:1px solid #ffffff55;border-radius:16px;padding:16px 20px;color:#190d24;font-size:17px;font-weight:900;letter-spacing:2px;background:linear-gradient(100deg,#ff8acb,#ffd08b);box-shadow:0 8px 28px #f06cba44;cursor:pointer}
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  background:
-    radial-gradient(ellipse at 50% 5%, #73345e 0%, transparent 48%),
-    linear-gradient(160deg, #160f28, #090b18 65%, #111827);
-  color: white;
-  font-family: Arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 22px;
-  overflow-x: hidden;
-}
-
-.app {
-  width: 100%;
-  max-width: 440px;
-  text-align: center;
-}
-
-.tag {
-  color: #ff80c5;
-  font-size: 11px;
-  letter-spacing: 5px;
-  margin-bottom: 15px;
-}
-
-.logo {
-  font-size: clamp(44px, 13vw, 65px);
-  font-weight: 1000;
-  letter-spacing: -4px;
-  line-height: 1;
-  color: #fff;
-  text-shadow:
-    0 0 12px #f06cba,
-    0 0 35px #a348b4;
-}
-
-.logo span {
-  display: block;
-  color: #ff8acb;
-  font-size: 0.75em;
-  letter-spacing: 9px;
-  margin-top: 9px;
-}
-
-.subtitle {
-  margin-top: 38px;
-  color: #e9b9db;
-  font-size: 13px;
-  letter-spacing: 3px;
-}
-
-.date {
-  margin-top: 12px;
-  font-size: 22px;
-  font-weight: bold;
-}
-
-.timer {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 9px;
-  margin-top: 35px;
-}
-
-.unit {
-  background: linear-gradient(145deg,
-    rgba(255,255,255,.12),
-    rgba(255,255,255,.035));
-  border: 1px solid rgba(255,140,210,.25);
-  border-radius: 13px;
-  padding: 17px 3px;
-  box-shadow: 0 0 20px rgba(223,76,164,.08);
-}
-
-.number {
-  font-size: clamp(25px, 7vw, 37px);
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  color: #fff;
-}
-
-.label {
-  font-size: 9px;
-  color: #e7a5d0;
-  letter-spacing: 1px;
-  margin-top: 9px;
-}
-
-.status {
-  margin-top: 28px;
-  color: #b9b1c9;
-  font-size: 12px;
-}
-
-.line {
-  height: 2px;
-  margin: 32px 0 20px;
-  background: linear-gradient(
-    90deg, transparent, #f26bbd, #8c63e8, transparent
-  );
-}
-
-.footer {
-  color: #817b9a;
-  font-size: 10px;
-  letter-spacing: 2px;
-}
-
+/* Portrait game layout */
+#gameScreen{display:none;position:fixed;inset:0;z-index:50;background:#080d18;padding:calc(8px + env(safe-area-inset-top)) 10px calc(9px + env(safe-area-inset-bottom));overflow:hidden}
+#gameScreen.open{display:flex;flex-direction:column}
+.game-shell{width:100%;height:100%;max-width:560px;margin:auto;display:flex;flex-direction:column;min-height:0}
+.game-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:0 0 auto;padding-bottom:7px}
+.game-title{font-size:clamp(14px,4vw,19px);font-weight:900;letter-spacing:1px;color:#f7d8eb}
+.back-button,.control-button{border:1px solid #ffffff45;border-radius:10px;padding:9px 11px;color:#fff;background:#101a2bdc;font-weight:800;cursor:pointer}
+.scorebar{display:flex;gap:7px;flex:0 0 auto;margin-bottom:7px}
+.score{flex:1;border:1px solid #ffffff38;border-radius:9px;padding:7px 9px;background:#071322e8;font-size:11px;font-weight:800}
+.score.left{color:#82dcff;text-align:left;border-left:3px solid #168fe2}
+.score.right{color:#ff9a9a;text-align:right;border-right:3px solid #df4354}
+.score strong{font-size:18px;margin-left:5px}
+.field-frame{position:relative;flex:1 1 auto;min-height:0;border:1px solid #a8c7dd70;border-radius:12px;overflow:hidden;background:#101b2b;box-shadow:0 8px 28px #0009}
+#gameCanvas{display:block;width:100%;height:100%;object-fit:fill}
+.field-caption{position:absolute;top:8px;left:50%;transform:translateX(-50%);padding:6px 12px;border-radius:20px;background:#071322d9;border:1px solid #ffffff50;font-size:11px;font-weight:900;white-space:nowrap;letter-spacing:.6px}
+.turn-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:8px 0 6px;flex:0 0 auto}
+.turn-label{font-size:12px;font-weight:900;color:#ffe3f2}
+.hint{font-size:10px;color:#c7c5d1;text-align:right;max-width:55%}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:0 0 auto}
+.control-card{background:#0e1929;border:1px solid #ffffff30;border-radius:10px;padding:8px 10px}
+.control-card label{display:flex;justify-content:space-between;gap:4px;color:#dce9f7;font-size:11px;font-weight:800;margin-bottom:5px}
+.control-card output{color:#7bdfff}
+input[type=range]{width:100%;accent-color:#168fe2;height:20px;margin:0}
+.action-row{display:flex;gap:8px;margin-top:8px;flex:0 0 auto}
+.action-row button{flex:1;min-height:44px}
+.launch-button{background:linear-gradient(100deg,#0879d5,#16b4ec);color:white;border:1px solid #9de8ff;font-size:14px;letter-spacing:1px}
+.reset-button{background:#ffffff12}
+.message{min-height:17px;margin-top:5px;text-align:center;color:#ffe0a8;font-size:11px;font-weight:700;flex:0 0 auto}
+@media(max-height:700px){.game-top{padding-bottom:4px}.scorebar{margin-bottom:4px}.turn-row{margin:5px 0}.control-card{padding:5px 8px}.action-row{margin-top:5px}.action-row button{min-height:38px}.message{margin-top:3px}}
 </style>
 </head>
-
 <body>
-
 <div class="app">
-
-  <div class="tag">FIXING LEAKS</div>
-
-  <div class="logo">
-    GRAND THEFT AUTO
-    <span>VI</span>
-  </div>
-
-  <div class="subtitle">
-    ОБРАТНЫЙ ОТСЧЕТ НАЧАЛСЯ
-  </div>
-
-  <div class="date">
-    19 НОЯБРЯ 2026
-  </div>
-
+  <div class="tag">FIXING LEAKS</div><div class="logo">GRAND THEFT AUTO<span>VI</span></div>
+  <div class="subtitle">ОБРАТНЫЙ ОТСЧЕТ НАЧАЛСЯ</div><div class="date">19 НОЯБРЯ 2026</div>
   <div class="timer">
-
-    <div class="unit">
-      <div class="number" id="days">000</div>
-      <div class="label">ДНЕЙ</div>
-    </div>
-
-    <div class="unit">
-      <div class="number" id="hours">00</div>
-      <div class="label">ЧАСОВ</div>
-    </div>
-
-    <div class="unit">
-      <div class="number" id="minutes">00</div>
-      <div class="label">МИНУТ</div>
-    </div>
-
-    <div class="unit">
-      <div class="number" id="seconds">00</div>
-      <div class="label">СЕКУНД</div>
-    </div>
-
+    <div class="unit"><div class="number" id="days">000</div><div class="label">ДНЕЙ</div></div>
+    <div class="unit"><div class="number" id="hours">00</div><div class="label">ЧАСОВ</div></div>
+    <div class="unit"><div class="number" id="minutes">00</div><div class="label">МИНУТ</div></div>
+    <div class="unit"><div class="number" id="seconds">00</div><div class="label">СЕКУНД</div></div>
   </div>
-
-  <div class="status" id="status">
-    Ожидание самого большого релиза...
-  </div>
-
-  <div class="line"></div>
-
-  <div class="footer">
-    VICE CITY • LEONIDA • 2026
-  </div>
-
+  <div class="status" id="status">Ожидание самого большого релиза...</div>
+  <button class="play-button" id="openGame">🎮 ИГРАТЬ</button>
+  <div class="line"></div><div class="footer">VICE CITY • LEONIDA • 2026</div>
 </div>
 
+<section id="gameScreen">
+ <div class="game-shell">
+  <div class="game-top"><div class="game-title">GTA VI DELIVERY</div><button class="back-button" id="closeGame">← НАЗАД</button></div>
+  <div class="scorebar"><div class="score left">ИГРОК 1 · УКРАИНА <strong id="leftScore">0</strong></div><div class="score right">ИГРОК 2 · РОССИЯ <strong id="rightScore">0</strong></div></div>
+  <div class="field-frame"><canvas id="gameCanvas" width="540" height="780"></canvas><div class="field-caption">ДОСТАВЬ КОРОБКУ НА СТОРОНУ СОПЕРНИКА</div></div>
+  <div class="turn-row"><div class="turn-label" id="turnLabel">ХОД ИГРОКА 1 · УКРАИНА</div><div class="hint" id="hint">Выбери угол и силу</div></div>
+  <div class="controls">
+   <div class="control-card"><label for="angle">УГОЛ <output id="angleValue">45°</output></label><input id="angle" type="range" min="15" max="75" value="45"></div>
+   <div class="control-card"><label for="power">СИЛА <output id="powerValue">70%</output></label><input id="power" type="range" min="30" max="100" value="70"></div>
+  </div>
+  <div class="action-row"><button class="control-button launch-button" id="launch">🚁 ЗАПУСК</button><button class="control-button reset-button" id="restart">↻ ЗАНОВО</button></div>
+  <div class="message" id="gameMessage">Первый ход — Игрок 1.</div>
+ </div>
+</section>
 <script>
-const tg = window.Telegram?.WebApp;
-
-if (tg) {
-  tg.ready();
-  tg.expand();
-
-  try {
-    tg.setHeaderColor("#160f28");
-    tg.setBackgroundColor("#100b19");
-  } catch(e) {}
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand();try{tg.setHeaderColor("#090d18");tg.setBackgroundColor("#090d18")}catch(e){}}
+const releaseDate=new Date(2026,10,19,0,0,0);
+function updateCountdown(){
+ const d=releaseDate.getTime()-Date.now();
+ if(d<=0){["days","hours","minutes","seconds"].forEach((id,i)=>document.getElementById(id).textContent=["000","00","00","00"][i]);document.getElementById("status").textContent="GTA VI RELEASED! WELCOME TO VICE CITY!";return}
+ document.getElementById("days").textContent=String(Math.floor(d/86400000)).padStart(3,"0");
+ document.getElementById("hours").textContent=String(Math.floor(d/3600000%24)).padStart(2,"0");
+ document.getElementById("minutes").textContent=String(Math.floor(d/60000%60)).padStart(2,"0");
+ document.getElementById("seconds").textContent=String(Math.floor(d/1000%60)).padStart(2,"0");
 }
+updateCountdown();setInterval(updateCountdown,1000);
 
-// Дата релиза: 19 ноября 2026 года.
-// Время: 00:00 по часовому поясу смартфона.
-const releaseDate = new Date(2026, 10, 19, 0, 0, 0);
-
-function updateCountdown() {
-
-  const now = Date.now();
-  const difference = releaseDate.getTime() - now;
-
-  if (difference <= 0) {
-    document.getElementById("days").textContent = "000";
-    document.getElementById("hours").textContent = "00";
-    document.getElementById("minutes").textContent = "00";
-    document.getElementById("seconds").textContent = "00";
-
-    document.getElementById("status").textContent =
-      "GTA VI RELEASED! WELCOME TO VICE CITY!";
-
-    return;
-  }
-
-  const days = Math.floor(
-    difference / (1000 * 60 * 60 * 24)
-  );
-
-  const hours = Math.floor(
-    (difference / (1000 * 60 * 60)) % 24
-  );
-
-  const minutes = Math.floor(
-    (difference / (1000 * 60)) % 60
-  );
-
-  const seconds = Math.floor(
-    (difference / 1000) % 60
-  );
-
-  document.getElementById("days").textContent =
-    String(days).padStart(3, "0");
-
-  document.getElementById("hours").textContent =
-    String(hours).padStart(2, "0");
-
-  document.getElementById("minutes").textContent =
-    String(minutes).padStart(2, "0");
-
-  document.getElementById("seconds").textContent =
-    String(seconds).padStart(2, "0");
+const screen=document.getElementById("gameScreen"),canvas=document.getElementById("gameCanvas"),ctx=canvas.getContext("2d");
+const bg=new Image();bg.src="game-field.jpg";
+const cover=new Image();cover.src="https://videoigr.net/images/GTA6ps5ff.png";
+let side=0,score=[0,0],flight=null,raf=null,last=0,open=false;
+const angle=document.getElementById("angle"),power=document.getElementById("power");
+const launchBtn=document.getElementById("launch"),msg=document.getElementById("gameMessage");
+function controls(){document.getElementById("angleValue").textContent=angle.value+"°";document.getElementById("powerValue").textContent=power.value+"%"}
+angle.addEventListener("input",controls);power.addEventListener("input",controls);controls();
+function draw(){
+ const W=540,H=780;
+ ctx.clearRect(0,0,W,H);
+ if(bg.complete&&bg.naturalWidth){
+  const s=Math.max(W/bg.width,H/bg.height),sw=W/s,sh=H/s;
+  ctx.drawImage(bg,(bg.width-sw)/2,(bg.height-sh)/2,sw,sh,0,0,W,H);
+ }else{
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,"#7187a1");g.addColorStop(1,"#253d36");ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ }
+ // cinematic vignette and border highlight
+ const v=ctx.createLinearGradient(0,0,0,H);v.addColorStop(0,"#06101b66");v.addColorStop(.55,"#06101b08");v.addColorStop(1,"#06101bcc");ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+ ctx.save();ctx.setLineDash([9,8]);ctx.strokeStyle="#fff1b5";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(270,180);ctx.lineTo(270,760);ctx.stroke();ctx.restore();
+ ctx.fillStyle="#071321d9";ctx.strokeStyle="#ffffff88";ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(222,420,96,27,6);ctx.fill();ctx.stroke();
+ ctx.fillStyle="#fff";ctx.font="bold 11px Arial";ctx.textAlign="center";ctx.fillText("ГРАНИЦА",270,438);
+ // active side marker
+ ctx.fillStyle=side===0?"#1599ef":"#ee5967";ctx.beginPath();ctx.arc(side===0?72:468,650,12,0,Math.PI*2);ctx.fill();
+ // moving drone and package
+ if(flight){
+  const f=flight,t=Math.min(f.t,1),x=f.x0+(f.x1-f.x0)*t,y=f.y0-Math.sin(t*Math.PI)*f.arc;
+  ctx.save();ctx.translate(x,y);
+  ctx.strokeStyle="#172231";ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-28,0);ctx.lineTo(28,0);ctx.moveTo(-20,-3);ctx.lineTo(-30,-12);ctx.moveTo(20,-3);ctx.lineTo(30,-12);ctx.stroke();
+  ctx.fillStyle="#27394b";ctx.beginPath();ctx.roundRect(-15,-7,30,14,5);ctx.fill();
+  ctx.strokeStyle="#dcecff";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,8);ctx.lineTo(0,21);ctx.stroke();
+  ctx.restore();
+  const bx=f.released?f.boxX:x,by=f.released?f.boxY:y+27;
+  if(f.released){ctx.fillStyle="#172b54";ctx.fillRect(bx-12,by-18,24,36);ctx.strokeStyle="#f7e6c3";ctx.strokeRect(bx-12,by-18,24,36);ctx.fillStyle="#fff";ctx.font="bold 7px Arial";ctx.textAlign="center";ctx.fillText("GTA VI",bx,by+2)}
+  else {ctx.fillStyle="#172b54";ctx.fillRect(bx-12,by-18,24,36);ctx.strokeStyle="#f7e6c3";ctx.strokeRect(bx-12,by-18,24,36);ctx.fillStyle="#fff";ctx.font="bold 7px Arial";ctx.textAlign="center";ctx.fillText("GTA VI",bx,by+2)}
+ }
 }
-
-updateCountdown();
-setInterval(updateCountdown, 1000);
-
+function updateScore(){document.getElementById("leftScore").textContent=score[0];document.getElementById("rightScore").textContent=score[1]}
+function setTurn(){document.getElementById("turnLabel").textContent=side===0?"ХОД ИГРОКА 1 · УКРАИНА":"ХОД ИГРОКА 2 · РОССИЯ";document.getElementById("hint").textContent=side===0?"Запуск слева направо":"Запуск справа налево";draw()}
+function launch(){
+ if(flight)return;
+ const a=Number(angle.value)*Math.PI/180,p=Number(power.value),dir=side===0?1:-1;
+ const x0=side===0?72:468,dist=120+p*2.45*Math.sin(2*a);
+ flight={side,x0,x1:Math.max(35,Math.min(505,x0+dir*dist)),y0:270,arc:115+p*1.15*Math.sin(a),t:0,released:false,boxX:0,boxY:0,elapsed:0};
+ msg.textContent="БПЛА несёт коробку GTA VI…";launchBtn.disabled=true;launchBtn.style.opacity=".55";last=performance.now();raf=requestAnimationFrame(tick);
+}
+function tick(now){
+ if(!flight)return;const dt=Math.min((now-last)/1000,.04);last=now;const f=flight;f.elapsed+=dt;f.t=Math.min(f.elapsed/2.4,1);
+ const x=f.x0+(f.x1-f.x0)*f.t,y=f.y0-Math.sin(f.t*Math.PI)*f.arc;
+ if(f.t>=.72&&!f.released){f.released=true;f.boxX=x;f.boxY=y+25}
+ if(f.released)f.boxY+=180*dt;
+ draw();
+ if(f.t>=1&&f.released&&f.boxY>=690){
+  const crossed=f.side===0?f.boxX>270:f.boxX<270;
+  if(crossed){score[f.side]++;msg.textContent="Коробка доставлена на сторону соперника! +1";}else msg.textContent="Коробка осталась на своей стороне.";
+  updateScore();flight=null;side=1-side;launchBtn.disabled=false;launchBtn.style.opacity="1";setTurn();return;
+ }
+ raf=requestAnimationFrame(tick);
+}
+function reset(){if(raf)cancelAnimationFrame(raf);raf=null;flight=null;side=0;score=[0,0];updateScore();launchBtn.disabled=false;launchBtn.style.opacity="1";msg.textContent="Новая партия. Первый ход — Украина.";setTurn()}
+function openGame(){open=true;screen.classList.add("open");document.body.style.overflow="hidden";setTurn();if(tg?.BackButton)try{tg.BackButton.show()}catch(e){}}
+function closeGame(){open=false;screen.classList.remove("open");document.body.style.overflow="";if(tg?.BackButton)try{tg.BackButton.hide()}catch(e){}}
+document.getElementById("openGame").onclick=openGame;document.getElementById("closeGame").onclick=closeGame;launchBtn.onclick=launch;document.getElementById("restart").onclick=reset;
+if(tg?.BackButton)tg.BackButton.onClick(()=>{if(open)closeGame()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&open)closeGame()});
+bg.onload=draw;cover.onload=draw;draw();
 </script>
-
 </body>
 </html>
-
