@@ -1,1 +1,256 @@
 
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#100b19">
+<title>GTA VI Countdown</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 50% 5%, #73345e 0%, transparent 48%),
+    linear-gradient(160deg, #160f28, #090b18 65%, #111827);
+  color: white;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 22px;
+  overflow-x: hidden;
+}
+
+.app {
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+}
+
+.tag {
+  color: #ff80c5;
+  font-size: 11px;
+  letter-spacing: 5px;
+  margin-bottom: 15px;
+}
+
+.logo {
+  font-size: clamp(44px, 13vw, 65px);
+  font-weight: 1000;
+  letter-spacing: -4px;
+  line-height: 1;
+  color: #fff;
+  text-shadow:
+    0 0 12px #f06cba,
+    0 0 35px #a348b4;
+}
+
+.logo span {
+  display: block;
+  color: #ff8acb;
+  font-size: 0.75em;
+  letter-spacing: 9px;
+  margin-top: 9px;
+}
+
+.subtitle {
+  margin-top: 38px;
+  color: #e9b9db;
+  font-size: 13px;
+  letter-spacing: 3px;
+}
+
+.date {
+  margin-top: 12px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.timer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+  margin-top: 35px;
+}
+
+.unit {
+  background: linear-gradient(145deg,
+    rgba(255,255,255,.12),
+    rgba(255,255,255,.035));
+  border: 1px solid rgba(255,140,210,.25);
+  border-radius: 13px;
+  padding: 17px 3px;
+  box-shadow: 0 0 20px rgba(223,76,164,.08);
+}
+
+.number {
+  font-size: clamp(25px, 7vw, 37px);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+
+.label {
+  font-size: 9px;
+  color: #e7a5d0;
+  letter-spacing: 1px;
+  margin-top: 9px;
+}
+
+.status {
+  margin-top: 28px;
+  color: #b9b1c9;
+  font-size: 12px;
+}
+
+.line {
+  height: 2px;
+  margin: 32px 0 20px;
+  background: linear-gradient(
+    90deg, transparent, #f26bbd, #8c63e8, transparent
+  );
+}
+
+.footer {
+  color: #817b9a;
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="tag">WELCOME TO LEONIDA</div>
+
+  <div class="logo">
+    GRAND THEFT
+    <span>AUTO VI</span>
+  </div>
+
+  <div class="subtitle">
+    THE COUNTDOWN HAS BEGUN
+  </div>
+
+  <div class="date">
+    19 NOVEMBER 2026
+  </div>
+
+  <div class="timer">
+
+    <div class="unit">
+      <div class="number" id="days">000</div>
+      <div class="label">ДНЕЙ</div>
+    </div>
+
+    <div class="unit">
+      <div class="number" id="hours">00</div>
+      <div class="label">ЧАСОВ</div>
+    </div>
+
+    <div class="unit">
+      <div class="number" id="minutes">00</div>
+      <div class="label">МИНУТ</div>
+    </div>
+
+    <div class="unit">
+      <div class="number" id="seconds">00</div>
+      <div class="label">СЕКУНД</div>
+    </div>
+
+  </div>
+
+  <div class="status" id="status">
+    Ожидание самого большого релиза...
+  </div>
+
+  <div class="line"></div>
+
+  <div class="footer">
+    VICE CITY • LEONIDA • 2026
+  </div>
+
+</div>
+
+<script>
+const tg = window.Telegram?.WebApp;
+
+if (tg) {
+  tg.ready();
+  tg.expand();
+
+  try {
+    tg.setHeaderColor("#160f28");
+    tg.setBackgroundColor("#100b19");
+  } catch(e) {}
+}
+
+// Дата релиза: 19 ноября 2026 года.
+// Время: 00:00 по часовому поясу смартфона.
+const releaseDate = new Date(2026, 10, 19, 0, 0, 0);
+
+function updateCountdown() {
+
+  const now = Date.now();
+  const difference = releaseDate.getTime() - now;
+
+  if (difference <= 0) {
+    document.getElementById("days").textContent = "000";
+    document.getElementById("hours").textContent = "00";
+    document.getElementById("minutes").textContent = "00";
+    document.getElementById("seconds").textContent = "00";
+
+    document.getElementById("status").textContent =
+      "GTA VI RELEASED! WELCOME TO VICE CITY!";
+
+    return;
+  }
+
+  const days = Math.floor(
+    difference / (1000 * 60 * 60 * 24)
+  );
+
+  const hours = Math.floor(
+    (difference / (1000 * 60 * 60)) % 24
+  );
+
+  const minutes = Math.floor(
+    (difference / (1000 * 60)) % 60
+  );
+
+  const seconds = Math.floor(
+    (difference / 1000) % 60
+  );
+
+  document.getElementById("days").textContent =
+    String(days).padStart(3, "0");
+
+  document.getElementById("hours").textContent =
+    String(hours).padStart(2, "0");
+
+  document.getElementById("minutes").textContent =
+    String(minutes).padStart(2, "0");
+
+  document.getElementById("seconds").textContent =
+    String(seconds).padStart(2, "0");
+}
+
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+</script>
+
+</body>
+</html>
+
